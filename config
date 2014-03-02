@@ -1,0 +1,13 @@
+# Custom schroot profile settings.
+# See schroot.conf(5) and schroot-script-config(5) for further details.
+# The files detailed below may also be edited to further customise
+# this profile.
+
+# Filesystems to mount inside the chroot.
+FSTAB="/opt/build/fstab"
+
+# Files to copy from the host system into the chroot.
+COPYFILES="/opt/build/copyfiles"
+
+# System NSS databases to copy into the chroot.
+NSSDATABASES="/opt/build/nssdatabases"
