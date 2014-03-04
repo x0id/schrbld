@@ -1,9 +1,14 @@
 #!/bin/bash -e
 # ex: ts=4 sw=4 et
 
+# volume group name, where we're going to play
 vg=extra
+
+# added schroot configuration folder
 chroot_d=/etc/schroot/chroot.d
 
+# conf file needed to enforce 32-bit personality on x86_64 platform
+# via schroot command
 to_32_conf () {
     echo
     echo "[to32]"
@@ -12,6 +17,7 @@ to_32_conf () {
     echo "personality=linux32"
 }
 
+# create minimum fedora chroot
 init_fedora () {
     local release=$1
     local bits=$2
@@ -22,13 +28,14 @@ init_fedora () {
     mkfs.ext4 $dev
     if [[ "$bits" == "32" ]]; then
         to_32_conf >${chroot_d}/to_32.conf
-        bootstrap $dev $release |schroot -c to32 -u root
+        fedora_bootstrap $dev $release |schroot -c to32 -u root
         rm -f ${chroot_d}/to_32.conf
     else
-        bootstrap $dev $release |bash
+        fedora_bootstrap $dev $release |bash
     fi
 }
 
+# write configuration files for created snapshots
 make_conf_fedora () {
     local release=$1
     local bits=$2
@@ -36,6 +43,7 @@ make_conf_fedora () {
     conf_fedora $release $bits >${chroot_d}/${name}.conf
 }
 
+# generate schroot configuration files content
 conf_fedora () {
     local release=$1
     local bits=$2
@@ -56,6 +64,7 @@ conf_fedora () {
     echo "script-config=../../opt/build/config"
 }
 
+# run add_rpms in chroot
 prep_fedora () {
     local release=$1
     local bits=$2
@@ -64,6 +73,16 @@ prep_fedora () {
     add_rpms |schroot -c source:$name -u root
 }
 
+# may be used to fix source snapshot package set
+fix_fedora () {
+    local release=$1
+    local bits=$2
+    local name=fedora_${release}_${bits}
+    cd /tmp
+    fix_rpms |schroot -c source:$name -u root
+}
+
+# install basic fedora rpms needed to configure, make etc.
 add_rpms () {
     local -a pkg
     local -i k=0
@@ -75,9 +94,7 @@ add_rpms () {
     pkg[k++]=file
     pkg[k++]=less
     pkg[k++]=diffutils
-    pkg[k++]=autoconf
-    pkg[k++]=automake
-    pkg[k++]=autoconf-archive
+    pkg[k++]=findutils
     pkg[k++]=git
     pkg[k++]=svn
     pkg[k++]=vim-enhanced
@@ -87,13 +104,30 @@ cat <<EOT
 EOT
 }
 
-bootstrap () {
+# remove rpms installed by mistake
+fix_rpms () {
+    local -a pkg
+    local -i k=0
+    pkg[k++]=autoconf
+    pkg[k++]=automake
+    pkg[k++]=autoconf-archive
+cat <<EOT
+    yum -y erase ${pkg[@]}
+EOT
+}
+
+# create minimum fedora distribution
+fedora_bootstrap () {
     local dev=$1
-    local release=$2
+    local -i release=$2
+    local -i myrel=`lsb_release -sr`
+    if (( release < myrel )); then
+        opts="--nogpgcheck"
+    fi
 cat <<EOT
     mnt=\`mktemp -d\`
     mount $dev \$mnt
-    yum -y --releasever=$release --installroot=\$mnt --disablerepo='*' \
+    yum -y $opts --releasever=$release --installroot=\$mnt --disablerepo='*' \
         --enablerepo=fedora install fedora-release yum
     mkdir -p \$mnt/home/build
     chown build:build \$mnt/home/build
@@ -103,6 +137,19 @@ cat <<EOT
 EOT
 }
 
-# init_fedora 20 32
-# make_conf_fedora 20 32
-prep_fedora 20 32
+# create one fedora chroot
+make_fedora_root () {
+    local dev=$1
+    local release=$2
+    init_fedora $dev $release
+    make_conf_fedora $dev $release
+    prep_fedora $dev $release
+}
+
+# create dozen fedora chroots in a one shot
+for rel in 15 16 17 18 19 20; do
+    for bits in 32 64; do
+        make_fedora_root $rel $bits
+        # fix_fedora $rel $bits
+    done
+done
