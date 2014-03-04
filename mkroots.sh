@@ -96,7 +96,7 @@ add_rpms () {
     pkg[k++]=diffutils
     pkg[k++]=findutils
     pkg[k++]=git
-    pkg[k++]=svn
+    pkg[k++]=subversion
     pkg[k++]=vim-enhanced
 cat <<EOT
     yum -y update
