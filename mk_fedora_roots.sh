@@ -1,5 +1,17 @@
 #!/bin/bash -e
-# ex: ts=4 sw=4 et
+# ex: ft=sh ts=4 sw=4 et
+#------------------------------------------------------------------------
+# This script creates Fedora Linux schroots for given number of releases
+# (32 and/or 64 bits) using yum utility and Fedora 18 x86_64 host OS. May
+# also work with other releases, with some adjustments.
+#------------------------------------------------------------------------
+# Since: 03 March 2014
+#------------------------------------------------------------------------
+# Copyright (C) 2014 Dmitriy Kargapolov <dmitriy.kargapolov@gmail.com>
+# Use, modification and distribution are subject to the Boost Software
+# License, Version 1.0 (See accompanying file LICENSE_1_0.txt or copy
+# at http://www.boost.org/LICENSE_1_0.txt)
+#------------------------------------------------------------------------
 
 # volume group name, where we're going to play
 vg=extra

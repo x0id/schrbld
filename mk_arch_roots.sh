@@ -1,5 +1,16 @@
 #!/bin/bash
-# ex: ts=4 sw=4 et
+# ex: ft=sh ts=4 sw=4 et
+#------------------------------------------------------------------------
+# This script creates Arch Linux schroots (32 and/or 64 bits) from given
+# ISO image. Host OS tested - Fedora 18 x86_64.
+#------------------------------------------------------------------------
+# Since: 07 March 2014
+#------------------------------------------------------------------------
+# Copyright (C) 2014 Dmitriy Kargapolov <dmitriy.kargapolov@gmail.com>
+# Use, modification and distribution are subject to the Boost Software
+# License, Version 1.0 (See accompanying file LICENSE_1_0.txt or copy
+# at http://www.boost.org/LICENSE_1_0.txt)
+#------------------------------------------------------------------------
 
 # volume group name, where we're going to play
 vg=extra
