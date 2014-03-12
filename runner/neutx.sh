@@ -30,7 +30,7 @@ else
 fi
 
 if (( $build_dev )); then
-    ./devconf.sh
+    eval "$opts ./devconf.sh"
     make
     if (( $test_dev )); then
         ./test.sh all
@@ -42,7 +42,7 @@ if (( $build_prod )); then
         make clean
         make distclean
     fi
-    ./conf.sh
+    eval "$opts ./conf.sh"
     make
     if (( $test_prod )); then
         ./test.sh all

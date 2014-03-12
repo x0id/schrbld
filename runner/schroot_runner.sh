@@ -48,6 +48,7 @@ for sid in ${target[@]}; do
         echo "running test in schroot $sid, session $ses"
     fi
     schroot -c $sid -b -n $ses
+    [[ -n $set_target_scripts ]] && $set_target_scripts $sid
     for cmd in ${script[@]}; do
         case $cmd in
         *:root)
@@ -55,13 +56,13 @@ for sid in ${target[@]}; do
             if (( $verbose )); then
                 echo running $cmd as root
             fi
-            $cmd |schroot -c $ses -u root -r
+            $cmd $sid |schroot -c $ses -u root -r
             ;;
         *)
             if (( $verbose )); then
                 echo running $cmd
             fi
-            $cmd |schroot -c $ses -r
+            $cmd $sid |schroot -c $ses -r
             ;;
         esac
     done
