@@ -51,6 +51,9 @@ for sid in ${target[@]}; do
     [[ -n $set_target_scripts ]] && $set_target_scripts $sid
     for cmd in ${script[@]}; do
         case $cmd in
+        leave)
+            break
+            ;;
         *:root)
             cmd=${cmd%:root}
             if (( $verbose )); then
@@ -66,5 +69,5 @@ for sid in ${target[@]}; do
             ;;
         esac
     done
-    schroot -c $ses -e
+    [[ $cmd != leave ]] && schroot -c $ses -e
 done

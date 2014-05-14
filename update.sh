@@ -18,6 +18,7 @@ update_fedora () {
     cd /tmp
     echo "working on $name"
     echo "yum -y update" |schroot -c source:$name -u root
+    cd; tar cf - .ssh/id_dsa |schroot -c source:$name -- tar xvf -
 }
 
 update_centos () {
@@ -27,6 +28,7 @@ update_centos () {
     cd /tmp
     echo "working on $name"
     echo "yum -y update" |schroot -c source:$name -u root
+    cd; tar cf - .ssh/id_dsa |schroot -c source:$name -- tar xvf -
 }
 
 update_arch () {
@@ -35,6 +37,7 @@ update_arch () {
     cd /tmp
     echo "working on $name"
     echo "pacman --noconfirm -Syu" |schroot -c source:$name -u root
+    cd; tar cf - .ssh/id_dsa |schroot -c source:$name -- tar xvf -
 }
 
 for rel in 15 16 17 18 19 20; do
