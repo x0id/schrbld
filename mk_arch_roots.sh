@@ -94,7 +94,7 @@ mount_squash_fs () {
     local bits=$2
     local dir=`mktemp -d`
     mount -o loop $disk $dir && {
-        local file=$dir/root-image.fs
+        local file=$dir/airootfs.img
         [[ -f $file ]] && make_cow_file $file $bits
         umount $dir
     }
@@ -111,7 +111,7 @@ arch_mount () {
     local bits=$2
     local dir=`mktemp -d`
     mount -o loop $disk $dir && {
-        local file=$dir/arch/$(bits_to_arch $bits)/root-image.fs.sfs
+        local file=$dir/arch/$(bits_to_arch $bits)/airootfs.sfs
         [[ -f $file ]] && mount_squash_fs $file $bits
         umount $dir
     }
@@ -139,8 +139,8 @@ conf_arch () {
     echo "root-users=build"
     echo "source-root-users=build"
     echo "device=$dev"
-    echo "lvm-snapshot-options=--size 1G"
-    echo "script-config=../../opt/build/config"
+    echo "lvm-snapshot-options=--size 2G"
+    echo "profile=../../opt/build"
 }
 
 # generate commands for post-bootstrap tasks
@@ -186,7 +186,7 @@ init_arch () {
     local name=arch_${bits}
     local lv=vol_${name}
     local dev=/dev/$vg/$lv
-    lvcreate -L 2G $vg -n $lv || return 1
+    lvcreate -L 4G $vg -n $lv || return 1
     mkfs.ext4 $dev || return 1
     arch_bootstrap $dev |arch_mount $disk $bits
 }
